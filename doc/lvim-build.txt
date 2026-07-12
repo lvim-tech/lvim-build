@@ -1,0 +1,162 @@
+*lvim-build.txt*    Compile/run/test the current file or project via lvim-tasks
+
+==============================================================================
+CONTENTS                                              *lvim-build*
+
+  1. Introduction ........................... |lvim-build-intro|
+  2. Setup .................................. |lvim-build-setup|
+  3. Command ................................ |lvim-build-command|
+  4. Detectors (recipes) .................... |lvim-build-recipes|
+  5. Custom recipes ......................... |lvim-build-custom|
+  6. Frecency / redo memory ................. |lvim-build-memory|
+  7. Highlights ............................. |lvim-build-highlights|
+
+==============================================================================
+1. INTRODUCTION                                       *lvim-build-intro*
+
+lvim-build detects what the current file/project is and offers every
+applicable ACTION — compile, run, test, bench, lint — in one chooser,
+grouped and frecency-ordered. Selecting an action executes it through
+lvim-tasks (REQUIRED: build detects and describes, tasks runs and displays —
+output panel, spinner, restart, and problem-matcher → quickfix inherited),
+and remembers the choice per project so `:LvimBuild redo` re-runs it with no
+UI. Requires Neovim >= 0.11.
+
+Detection is synchronous but cheap: root markers are stat'ed first, files
+(Makefile, package.json, …) are parsed only when their marker exists, and
+the project-level result is CACHED per root until a marker's mtime changes.
+
+==============================================================================
+2. SETUP                                              *lvim-build-setup*
+>lua
+  require("lvim-build").setup({
+      layout = "float",              -- chooser layout: float|area|bottom
+      title = "Build",
+      title_pos = "left",            -- left|center|right
+      save = "current",              -- "current" | "all" | false (pre-run)
+      single_file = true,            -- no-project fallbacks (gcc/rustc/…)
+      recipes = {},                  -- user detectors (|lvim-build-custom|)
+      order = { "Build", "Run", "Test", "Bench", "Lint" },
+      colors = {                     -- group accents (palette keys/#rrggbb)
+          Build = "blue",
+          Run = "green",
+          Test = "yellow",
+          Bench = "magenta",
+          Lint = "cyan",
+      },
+      icons = {
+          build = "󰏗",              -- chooser / overlay lead glyph
+          action = "󰐊",             -- fallback action glyph
+          expand_open = "",         -- section carets
+          expand_closed = "",
+      },
+  })
+<
+==============================================================================
+3. COMMAND                                            *lvim-build-command*
+
+                                                      *:LvimBuild*
+:LvimBuild [{arg}] [{layout}]
+
+  A {layout} token (`float` | `area` | `bottom`) is recognised anywhere in
+  the arguments and is sticky for the session.
+
+  (none)      the chooser — every detected action, grouped, frecency-ordered
+  redo        re-run this project's most recent action, no UI
+  last        show (not run) the redo target in the statusline overlay
+  {group}     chooser restricted to one group (Build/Run/Test/Bench/Lint)
+
+Chooser keys: j/k move, <CR> on a section header folds it, <CR> on an action
+runs it, q/<Esc> close. The cursor opens on the project's most recent action.
+
+==============================================================================
+4. DETECTORS (RECIPES)                                *lvim-build-recipes*
+
+Project-level (root-marker driven; result cached per root by marker mtime):
+
+  cargo     Cargo.toml       build, build --release, run, test, bench, clippy
+  make      Makefile         one action per TARGET (tolerant line scan;
+                             dot-targets, pattern rules and assignments skipped)
+  cmake     CMakeLists.txt   configure, build, ctest (a `build/` tree)
+  node      package.json     one action per `scripts` entry, run with the
+                             package manager the lockfile identifies
+                             (bun/pnpm/yarn, npm otherwise)
+  go        go.mod           build ./..., run ., test ./..., vet ./...
+  just      justfile         one action per recipe (private `_…` skipped)
+  meson     meson.build      setup, compile, test (a `builddir` tree)
+  gradle    build.gradle…    build, test (`./gradlew` when present)
+  maven     pom.xml          compile, package, test
+  python    pyproject.toml   pytest / ruff check (only when mentioned there)
+
+Single-file fallbacks (only when no project marker owns the buffer; gated by
+`single_file`; compiles land in `stdpath("cache")/lvim-build/`):
+
+  c / cpp        gcc / g++ build, build & run
+  rust_single    rustc build, build & run (outside any cargo project)
+  python_single  python3 <file>
+  lua            nvim -l <file> (always available — the editor's runtime)
+  shell          run (shebang-aware interpreter), `-n` syntax check
+
+Group heuristics for named targets/scripts: test/spec → Test, bench → Bench,
+lint/fmt/format/check → Lint, run/start/serve/dev/watch/preview → Run,
+otherwise Build.
+
+Every action carries the fitting lvim-tasks problem matcher (`rust`, `gcc`,
+`go`, `python`, `lua`, `generic`), so errors land in the quickfix list.
+
+==============================================================================
+5. CUSTOM RECIPES                                     *lvim-build-custom*
+
+A recipe is data + one detect function; `config.recipes` entries merge over
+the built-ins by name: >lua
+
+  require("lvim-build").setup({
+      recipes = {
+          zig = {
+              kind = "project",           -- "project" (cached) | "file"
+              markers = { "build.zig" },  -- cache-invalidation stamps
+              detect = function(ctx)      -- ctx = { file, ft, root }
+                  local marker =
+                      require("lvim-build.context").marker(ctx, "build.zig")
+                  if not marker then
+                      return {}
+                  end
+                  local cwd = vim.fs.dirname(marker)
+                  return {
+                      {
+                          name = "zig build",
+                          group = "Build",
+                          cmd = { "zig", "build" },
+                          cwd = cwd,
+                      },
+                  }
+              end,
+          },
+      },
+  })
+<
+An action is `{ name, group, cmd (argv list or shell string), cwd, env?,
+matcher? }`.
+
+==============================================================================
+6. FRECENCY / REDO MEMORY                             *lvim-build-memory*
+
+Every run is recorded per PROJECT ROOT (the nearest `.git` ancestor, else
+the cwd) in the plugin's own database
+`stdpath("data")/lvim-build/lvim-build.db` (SQLite via lvim-utils.store):
+usage count + last-used per action. The chooser orders each group by
+count + a recency bonus decaying over a week; `redo` targets the most
+recently used action, re-DETECTED so a stale target falls back to the
+chooser. Without sqlite.lua the memory is session-only (health warns).
+
+==============================================================================
+7. HIGHLIGHTS                                         *lvim-build-highlights*
+
+Self-themed from the lvim-utils palette; accents from `colors`:
+
+  LvimBuild<Group>Badge, LvimBuild<Group>Name   (per configured group)
+  LvimBuildText  LvimBuildDim  LvimBuildEmpty
+
+The section fold headers use the shared lvim-utils fold-header accents.
+
+vim:tw=78:ts=8:noet:ft=help:norl:
