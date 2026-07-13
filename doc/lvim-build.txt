@@ -86,14 +86,24 @@ Project-level (root-marker driven; result cached per root by marker mtime):
   meson     meson.build      setup, compile, test (a `builddir` tree)
   gradle    build.gradle…    build, test (`./gradlew` when present)
   maven     pom.xml          compile, package, test
-  python    pyproject.toml   pytest / ruff check (only when mentioned there)
+  python    pyproject.toml   pytest / tox / nox, ruff / mypy / black / flake8,
+            setup.py         build + sync + install deps, Django manage.py
+            setup.cfg        runserver + test. Every command is resolved through
+            requirements.txt the project's virtualenv (.venv/venv/$VIRTUAL_ENV),
+            Pipfile          else its package manager (uv/poetry/pipenv/hatch),
+            tox.ini          else the PATH — and is offered ONLY when it really
+            noxfile.py       resolves, so the chooser never lists a command that
+            manage.py        cannot run.
 
 Single-file fallbacks (only when no project marker owns the buffer; gated by
 `single_file`; compiles land in `stdpath("cache")/lvim-build/`):
 
   c / cpp        gcc / g++ build, build & run
   rust_single    rustc build, build & run (outside any cargo project)
-  python_single  python3 <file>
+  python_single  python <file> — through the PROJECT's interpreter when there is
+                 one (venv / package manager). NOT suppressed inside a project:
+                 running the script you are looking at is normal Python workflow
+                 (unlike compiling one .c file of a cmake project).
   lua            nvim -l <file> (always available — the editor's runtime)
   shell          run (shebang-aware interpreter), `-n` syntax check
 

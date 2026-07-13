@@ -25,7 +25,16 @@ local M = {}
 ---@field name    string
 ---@field kind    "project"|"file"  project = root-marker driven (cached); file = current-buffer fallback
 ---@field markers string[]?     The marker file names the detection stats/parses (the cache stamp)
+---@field watch?  fun(ctx: LvimBuildContext): string  Extra cache-stamp input (optional) — see below
 ---@field detect  fun(ctx: LvimBuildContext): LvimBuildAction[]
+
+-- `watch` exists because a recipe's actions can depend on state its MARKERS do not describe. The
+-- Python recipe is the case that forced it: its actions are resolved through the project's
+-- virtualenv and lockfile, so `uv sync` (which creates .venv/ and uv.lock, touching no marker)
+-- changes what should be offered — yet the marker stamp is unchanged, so the cache would keep
+-- serving the pre-sync action list until an unrelated marker edit or a restart. A recipe returns
+-- from `watch` any string that changes when its inputs change (conventionally path@mtime pairs);
+-- it is folded into the cache stamp. It never marks a project — only invalidates.
 
 -- The built-in detectors. Project recipes first (their actions lead), then the single-file
 -- fallbacks. Loaded once — each module is data + one detect function, no state.
@@ -102,6 +111,13 @@ local function stamp_of(ctx)
                 local path = context.marker(ctx, name)
                 if path then
                     parts[#parts + 1] = path .. "@" .. context.mtime(path)
+                end
+            end
+            -- …plus whatever else the recipe's actions depend on (a virtualenv, a lockfile).
+            if type(r.watch) == "function" then
+                local ok, extra = pcall(r.watch, ctx)
+                if ok and type(extra) == "string" and extra ~= "" then
+                    parts[#parts + 1] = extra
                 end
             end
         end

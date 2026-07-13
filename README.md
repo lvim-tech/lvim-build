@@ -14,9 +14,14 @@ no UI.
   (one action per Makefile TARGET, tolerantly scanned), `cmake` (configure/build/ctest), `node`
   (one action per package.json script, run with the package manager the lockfile identifies),
   `go` (build/run/test/vet), `just` (one action per recipe), `meson` (setup/compile/test),
-  `gradle` (wrapper-aware), `maven`, `python` (pytest / ruff when pyproject mentions them). And
-  single-file fallbacks when no project marker owns the buffer: gcc / g++ / rustc compile (into
-  `stdpath("cache")/lvim-build/`) and compile-and-run, `python3 <file>`, `nvim -l <file>` for
+  `gradle` (wrapper-aware), `maven`, `python` (pyproject / setup.py / requirements.txt / Pipfile /
+  tox.ini / noxfile.py / Django's manage.py — pytest, tox, nox, ruff, mypy, black, flake8, the
+  build/sync/install actions, `manage.py runserver`; each command resolved through the project's
+  own **virtualenv**, else its package manager (`uv` / `poetry` / `pipenv` / `hatch`), else the
+  PATH — and offered ONLY when it actually resolves). And single-file fallbacks when no project
+  marker owns the buffer: gcc / g++ / rustc compile (into
+  `stdpath("cache")/lvim-build/`) and compile-and-run, `python <file>` (the project's interpreter
+  when there is one — this one is offered inside a project too), `nvim -l <file>` for
   Lua, and shebang-aware shell run + `-n` syntax check.
 - **Chooser** (`:LvimBuild`) — one collapsible section per group (each in its own accent), the
   current file's filetype icon on every action's lead box, the command preview dimmed after the
@@ -88,7 +93,10 @@ Chooser keys: `j`/`k` move, `<CR>` on a section header folds it, `<CR>` on an ac
 A recipe is data + one `detect(ctx) → actions` function. `ctx` is
 `{ file, ft, root }`; each action is
 `{ name, group, cmd (argv or string), cwd, env?, matcher? }`. `kind = "project"` recipes are
-cached per root (declare `markers` — their mtimes invalidate the cache); `kind = "file"` recipes
+cached per root (declare `markers` — their mtimes invalidate the cache; add an optional
+`watch(ctx) -> string` when the actions depend on state the markers do not describe — the Python
+recipe watches the virtualenv and lockfiles, so `uv sync` refreshes the chooser at once);
+`kind = "file"` recipes
 run fresh per buffer and are gated by `single_file`.
 
 ```lua
