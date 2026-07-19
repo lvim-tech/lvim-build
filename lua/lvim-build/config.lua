@@ -11,6 +11,7 @@
 ---@field title_pos   "left"|"center"|"right"  Chooser title alignment
 ---@field save        "current"|"all"|false  What to write before running an action
 ---@field single_file boolean  Enable the no-project single-file fallbacks (gcc/g++/rustc/python/…)
+---@field memory_retention_days integer  Prune usage rows not run in this many days (0 = keep forever)
 ---@field recipes     table<string, LvimBuildRecipe>  Extra user detectors (same shape as built-ins)
 ---@field order       string[] Group display order in the chooser
 ---@field colors      table<string, string>  Group accents (lvim-utils palette keys or "#rrggbb")
@@ -29,6 +30,9 @@ return {
     -- Offer the single-file fallbacks (compile/run THIS buffer via gcc/g++/rustc/python/nvim -l/
     -- bash) when no project marker owns the file.
     single_file = true,
+    -- Prune usage rows not run in this many days on the first store open each session (keeps the
+    -- frecency db from accreting rows for deleted projects / renamed actions forever). 0 disables it.
+    memory_retention_days = 180,
     -- Extra user detectors, merged over the built-ins by name (same recipe shape — see README).
     recipes = {},
     -- The group order in the chooser (groups a detection did not produce are skipped).

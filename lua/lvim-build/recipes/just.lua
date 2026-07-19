@@ -7,6 +7,10 @@
 local context = require("lvim-build.context")
 local util = require("lvim-build.recipes.util")
 
+-- Cap the recipe actions (same rationale as make.lua): a mono-repo justfile importing/generating
+-- dozens of recipes would otherwise flood the chooser.
+local MAX_TARGETS = 30
+
 ---@type LvimBuildRecipe
 return {
     name = "just",
@@ -34,6 +38,9 @@ return {
                         cwd = cwd,
                         matcher = "generic",
                     }
+                    if #out >= MAX_TARGETS then
+                        break
+                    end
                 end
             end
         end

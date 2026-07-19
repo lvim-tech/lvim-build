@@ -145,6 +145,8 @@ require("lvim-build").setup({
     -- Offer the single-file fallbacks (compile/run THIS buffer via gcc/g++/rustc/python/nvim -l/
     -- bash) when no project marker owns the file.
     single_file = true,
+    -- Prune usage rows not run in this many days on first store open each session (0 = keep forever).
+    memory_retention_days = 180,
     -- Extra user detectors, merged over the built-ins by name (same recipe shape — see above).
     recipes = {},
     -- The group order in the chooser (groups a detection did not produce are skipped).

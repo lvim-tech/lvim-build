@@ -35,6 +35,7 @@ the project-level result is CACHED per root until a marker's mtime changes.
       title_pos = "left",            -- left|center|right
       save = "current",              -- "current" | "all" | false (pre-run)
       single_file = true,            -- no-project fallbacks (gcc/rustc/…)
+      memory_retention_days = 180,   -- prune usage rows older than N days (0 = keep)
       recipes = {},                  -- user detectors (|lvim-build-custom|)
       order = { "Build", "Run", "Test", "Bench", "Lint" },
       colors = {                     -- group accents (palette keys/#rrggbb)

@@ -158,14 +158,18 @@ function M.open(only_group, layout)
         end
         namew = math.min(namew, 32)
         local children = {}
-        for _, a in ipairs(list) do
-            local rname = "act_" .. group .. "_" .. a.name
+        for i, a in ipairs(list) do
+            -- Index the row key so two recipes emitting the SAME action name into one group don't
+            -- collapse to a single index entry (both rows would then confirm to the last one).
+            local rname = ("act_%s_%d_%s"):format(group, i, a.name)
             index[rname] = a
             if a.name == last_name and not initial_row then
                 initial_row = rname -- focus the redo target on open
             end
             local cmd = type(a.cmd) == "table" and table.concat(a.cmd --[[@as string[] ]], " ") or tostring(a.cmd)
-            local label = (" %-" .. namew .. "s"):format(a.name)
+            -- Pad to the column in DISPLAY cells, not bytes: string.format("%-Ns") counts bytes, so a
+            -- multibyte action name would be under-padded (namew comes from strdisplaywidth).
+            local label = " " .. a.name .. string.rep(" ", math.max(0, namew - vim.fn.strdisplaywidth(a.name)))
             local spans = { { 1, 1 + #label, "LvimBuild" .. group .. "Name" } }
             children[#children + 1] = {
                 type = "action",

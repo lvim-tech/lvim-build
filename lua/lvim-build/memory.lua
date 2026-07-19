@@ -32,6 +32,21 @@ local SCHEMA = {
     last_used = { "integer" },
 }
 
+--- One-time-per-session sweep of stale usage rows: drop anything not run within
+--- `config.memory_retention_days` days so the frecency db does not accrete rows for deleted
+--- projects / renamed actions forever. 0 (or missing) keeps everything.
+---@param store table  an open sqlite store
+local function vacuum(store)
+    local days = require("lvim-build.config").memory_retention_days
+    if type(days) ~= "number" or days <= 0 or type(store.exec) ~= "function" then
+        return
+    end
+    local cutoff = os.time() - math.floor(days) * 86400
+    pcall(function()
+        store:exec("DELETE FROM usage WHERE last_used < ?", { cutoff })
+    end)
+end
+
 --- Open the store lazily (once); nil when the sqlite backend is unavailable / did not open.
 ---@return table?
 local function ensure()
@@ -51,6 +66,9 @@ local function ensure()
     })
     if not (db and db:is_open()) then
         db = nil
+    end
+    if db then
+        vacuum(db)
     end
     return db
 end

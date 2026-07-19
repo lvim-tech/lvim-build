@@ -143,6 +143,11 @@ function M.actions(ctx)
                 local ok, actions = pcall(r.detect, ctx)
                 if ok then
                     vim.list_extend(project, actions or {})
+                else
+                    vim.notify_once(
+                        ("lvim-build: recipe %q failed to detect: %s"):format(r.name, tostring(actions)),
+                        vim.log.levels.WARN
+                    )
                 end
             end
         end
@@ -155,6 +160,11 @@ function M.actions(ctx)
                 local ok, actions = pcall(r.detect, ctx)
                 if ok then
                     vim.list_extend(out, actions or {})
+                else
+                    vim.notify_once(
+                        ("lvim-build: recipe %q failed to detect: %s"):format(r.name, tostring(actions)),
+                        vim.log.levels.WARN
+                    )
                 end
             end
         end

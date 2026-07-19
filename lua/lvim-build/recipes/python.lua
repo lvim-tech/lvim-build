@@ -108,10 +108,18 @@ return {
         local pyproject = read(root, "pyproject.toml")
         local env = env_mod.resolve(root, pyproject)
 
-        -- The texts a tool can be "configured" in.
+        -- The texts a tool can be "configured" in. Build with explicit appends — a `{ pyproject,
+        -- read("setup.cfg"), read("tox.ini") }` constructor embeds nils positionally and `ipairs`
+        -- stops at the first hole, so a nil pyproject would silently drop setup.cfg/tox.ini.
         local texts = {}
-        for _, t in ipairs({ pyproject, read(root, "setup.cfg"), read(root, "tox.ini") }) do
-            texts[#texts + 1] = t
+        for _, name in ipairs({ "setup.cfg", "tox.ini" }) do
+            local t = read(root, name)
+            if t then
+                texts[#texts + 1] = t
+            end
+        end
+        if pyproject then
+            texts[#texts + 1] = pyproject
         end
 
         local out = {}
