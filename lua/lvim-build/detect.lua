@@ -45,6 +45,7 @@ local BUILTIN = {
     "cmake",
     "node",
     "go",
+    "dart",
     "just",
     "meson",
     "gradle",

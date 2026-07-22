@@ -1,8 +1,8 @@
 # lvim-build
 
 "Just compile/run/test THIS." lvim-build auto-detects what the current file or project is —
-cargo, make, cmake, npm/pnpm/yarn/bun scripts, go, just, meson, gradle, maven, pyproject, or a
-single c/c++/rust/python/lua/shell file — and offers every applicable action in ONE chooser,
+cargo, make, cmake, npm/pnpm/yarn/bun scripts, go, dart/flutter, just, meson, gradle, maven,
+pyproject, or a single c/c++/rust/python/lua/shell file — and offers every applicable action in ONE chooser,
 grouped **Build / Run / Test / Bench / Lint** and ordered by **frecency** (the action you always
 run floats to the top). Selecting an action executes it through
 [lvim-tasks](https://github.com/lvim-tech/lvim-tasks) (a hard dependency: build detects and
@@ -13,7 +13,9 @@ no UI.
 - **Detectors** ("recipes") — project-level, root-marker driven: `cargo` (Cargo.toml), `make`
   (one action per Makefile TARGET, tolerantly scanned), `cmake` (configure/build/ctest), `node`
   (one action per package.json script, run with the package manager the lockfile identifies),
-  `go` (build/run/test/vet), `just` (one action per recipe), `meson` (setup/compile/test),
+  `go` (build/run/test/vet), `dart` (Flutter run/test/build/analyze or plain `dart` — flavour
+  detected from pubspec.yaml; FVM-aware via the optional lvim-lang toolchain), `just` (one action
+  per recipe), `meson` (setup/compile/test),
   `gradle` (wrapper-aware), `maven`, `python` (pyproject / setup.py / requirements.txt / Pipfile /
   tox.ini / noxfile.py / Django's manage.py — pytest, tox, nox, ruff, mypy, black, flake8, the
   build/sync/install actions, `manage.py runserver`; each command resolved through the project's
