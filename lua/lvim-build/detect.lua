@@ -73,6 +73,16 @@ local BUILTIN = {
     "julia",
     "r",
     "perl",
+    "crystal",
+    "nim",
+    "elm",
+    "v",
+    "odin",
+    "gleam",
+    "racket",
+    "purescript",
+    "ada",
+    "hare",
     "shell",
 }
 
