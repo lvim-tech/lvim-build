@@ -1,7 +1,7 @@
 # lvim-build
 
 "Just compile/run/test THIS." lvim-build auto-detects what the current file or project is —
-cargo, make, cmake, npm/pnpm/yarn/bun scripts, go, dart/flutter, just, meson, gradle, maven,
+cargo, make, cmake, npm/pnpm/yarn/bun scripts, go, dart/flutter, dotnet, just, meson, gradle, maven,
 pyproject, or a single c/c++/rust/python/lua/shell file — and offers every applicable action in ONE chooser,
 grouped **Build / Run / Test / Bench / Lint** and ordered by **frecency** (the action you always
 run floats to the top). Selecting an action executes it through
@@ -16,7 +16,8 @@ no UI.
   `go` (build/run/test/vet), `dart` (Flutter run/test/build/analyze or plain `dart` — flavour
   detected from pubspec.yaml; FVM-aware via the optional lvim-lang toolchain), `just` (one action
   per recipe), `meson` (setup/compile/test),
-  `gradle` (wrapper-aware), `maven`, `python` (pyproject / setup.py / requirements.txt / Pipfile /
+  `gradle` (wrapper-aware), `maven`, `dotnet` (`*.sln` / `*.csproj` → build/run/test, csharpier),
+  `python` (pyproject / setup.py / requirements.txt / Pipfile /
   tox.ini / noxfile.py / Django's manage.py — pytest, tox, nox, ruff, mypy, black, flake8, the
   build/sync/install actions, `manage.py runserver`; each command resolved through the project's
   own **virtualenv**, else its package manager (`uv` / `poetry` / `pipenv` / `hatch`), else the

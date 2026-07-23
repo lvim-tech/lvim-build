@@ -50,6 +50,7 @@ local BUILTIN = {
     "meson",
     "gradle",
     "maven",
+    "dotnet",
     "python",
     "c",
     "cpp",
