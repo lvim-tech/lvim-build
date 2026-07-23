@@ -119,6 +119,10 @@ local BUILTIN = {
     "prolog",
     "powershell",
     "assembly",
+    "jsonnet",
+    "cue",
+    "starlark",
+    "latex",
     "shell",
 }
 
