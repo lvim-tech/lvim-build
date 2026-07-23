@@ -83,6 +83,15 @@ local BUILTIN = {
     "purescript",
     "ada",
     "hare",
+    "groovy",
+    "rescript",
+    "vala",
+    "roc",
+    "fish",
+    "nushell",
+    "grain",
+    "commonlisp",
+    "pascal",
     "shell",
 }
 
