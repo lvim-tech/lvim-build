@@ -69,6 +69,10 @@ local BUILTIN = {
     "kotlin",
     "ocaml",
     "lua",
+    "d",
+    "julia",
+    "r",
+    "perl",
     "shell",
 }
 
