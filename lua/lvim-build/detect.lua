@@ -92,6 +92,14 @@ local BUILTIN = {
     "grain",
     "commonlisp",
     "pascal",
+    "html",
+    "css",
+    "json",
+    "yaml",
+    "toml",
+    "markdown",
+    "xml",
+    "graphql",
     "shell",
 }
 
