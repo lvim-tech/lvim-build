@@ -123,6 +123,14 @@ local BUILTIN = {
     "cue",
     "starlark",
     "latex",
+    "typst",
+    "gdscript",
+    "systemverilog",
+    "glsl",
+    "coq",
+    "move",
+    "cairo",
+    "lean",
     "shell",
 }
 
