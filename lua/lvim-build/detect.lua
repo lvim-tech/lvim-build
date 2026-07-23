@@ -107,6 +107,10 @@ local BUILTIN = {
     "proto",
     "helm",
     "ansible",
+    "svelte",
+    "vue",
+    "astro",
+    "twig",
     "shell",
 }
 
