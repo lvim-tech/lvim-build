@@ -100,6 +100,13 @@ local BUILTIN = {
     "markdown",
     "xml",
     "graphql",
+    "dockerfile",
+    "terraform",
+    "nix",
+    "sql",
+    "proto",
+    "helm",
+    "ansible",
     "shell",
 }
 
