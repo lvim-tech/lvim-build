@@ -111,6 +111,14 @@ local BUILTIN = {
     "vue",
     "astro",
     "twig",
+    "fortran",
+    "cobol",
+    "matlab",
+    "tcl",
+    "solidity",
+    "prolog",
+    "powershell",
+    "assembly",
     "shell",
 }
 
