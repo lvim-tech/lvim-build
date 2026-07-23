@@ -1,7 +1,7 @@
 # lvim-build
 
 "Just compile/run/test THIS." lvim-build auto-detects what the current file or project is —
-cargo, make, cmake, npm/pnpm/yarn/bun scripts, go, dart/flutter, dotnet, just, meson, gradle, maven,
+cargo, make, cmake, npm/pnpm/yarn/bun scripts, go, zig, dart/flutter, dotnet, just, meson, gradle, maven,
 pyproject, or a single c/c++/rust/python/lua/shell file — and offers every applicable action in ONE chooser,
 grouped **Build / Run / Test / Bench / Lint** and ordered by **frecency** (the action you always
 run floats to the top). Selecting an action executes it through
@@ -13,7 +13,8 @@ no UI.
 - **Detectors** ("recipes") — project-level, root-marker driven: `cargo` (Cargo.toml), `make`
   (one action per Makefile TARGET, tolerantly scanned), `cmake` (configure/build/ctest), `node`
   (one action per package.json script, run with the package manager the lockfile identifies),
-  `go` (build/run/test/vet), `dart` (Flutter run/test/build/analyze or plain `dart` — flavour
+  `go` (build/run/test/vet), `zig` (build/run/test/fmt — via the optional lvim-lang toolchain),
+  `dart` (Flutter run/test/build/analyze or plain `dart` — flavour
   detected from pubspec.yaml; FVM-aware via the optional lvim-lang toolchain), `just` (one action
   per recipe), `meson` (setup/compile/test),
   `gradle` (wrapper-aware), `maven`, `dotnet` (`*.sln` / `*.csproj` → build/run/test, csharpier),

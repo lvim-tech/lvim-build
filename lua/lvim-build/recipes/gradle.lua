@@ -1,5 +1,7 @@
--- lvim-build.recipes.gradle: a Gradle project (basic) — build/test via the wrapper when the
--- project ships one (`./gradlew`, the Gradle convention), the system `gradle` otherwise.
+-- lvim-build.recipes.gradle: a Gradle project (basic) — build/run/test via the wrapper when the
+-- project ships one (`./gradlew`, the Gradle convention), the system `gradle` otherwise. Language-
+-- agnostic (Java / Kotlin / Groovy / Scala): `run` maps to the Application plugin's `run` task, so a
+-- runnable Gradle app (a Kotlin `application {}` project included) is offered a Run action too.
 --
 ---@module "lvim-build.recipes.gradle"
 
@@ -22,6 +24,7 @@ return {
         local bin = vim.fn.executable(cwd .. "/gradlew") == 1 and "./gradlew" or "gradle"
         return {
             { name = bin .. " build", group = "Build", cmd = { bin, "build" }, cwd = cwd, matcher = "generic" },
+            { name = bin .. " run", group = "Run", cmd = { bin, "run" }, cwd = cwd, matcher = "generic" },
             { name = bin .. " test", group = "Test", cmd = { bin, "test" }, cwd = cwd, matcher = "generic" },
         }
     end,

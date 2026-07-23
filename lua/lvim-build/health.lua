@@ -18,6 +18,7 @@ local TOOLS = {
     { "cmake", "cmake" },
     { "npm", "node" },
     { "go", "go" },
+    { "zig", "zig (build / run / test / fmt)" },
     { "just", "just" },
     { "meson", "meson" },
     { "gradle", "gradle (a project ./gradlew wrapper also works)" },
